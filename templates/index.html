@@ -26,7 +26,7 @@
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
-            max-width: 600px;
+            max-width: 500px;
             width: 100%;
         }
         
@@ -44,13 +44,45 @@
             font-size: 14px;
         }
         
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn-admin {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-user {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-back {
+            background: #f0f0f0;
+            color: #666;
+            margin-top: 20px;
+        }
+        
         .input-group {
-            display: flex;
-            gap: 10px;
             margin-bottom: 20px;
         }
         
         input[type="text"], input[type="password"], textarea {
+            width: 100%;
             padding: 14px 18px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
@@ -63,57 +95,16 @@
             border-color: #667eea;
         }
         
-        input[type="text"], input[type="password"] {
-            width: 100%;
-        }
-        
         textarea {
-            width: 100%;
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
             font-family: inherit;
+            margin-bottom: 15px;
         }
         
-        button {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-check {
+        .btn-action {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-        }
-        
-        .btn-check:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-add {
-            background: #4CAF50;
-            color: white;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        
-        .btn-add:hover {
-            background: #45a049;
-        }
-        
-        .btn-batch {
-            background: #2196F3;
-            color: white;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        
-        .btn-batch:hover {
-            background: #1976D2;
         }
         
         .result {
@@ -137,22 +128,17 @@
             display: block;
         }
         
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
         .divider {
             border-top: 1px solid #e0e0e0;
             margin: 20px 0;
-            position: relative;
-        }
-        
-        .divider::after {
-            content: '已使用花名';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 0 15px;
-            color: #999;
-            font-size: 12px;
         }
         
         .name-list {
@@ -190,60 +176,20 @@
             font-size: 14px;
         }
         
-        .history-section {
-            margin-top: 20px;
-        }
-        
-        .history-title {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .btn-refresh {
-            background: #f0f0f0;
-            color: #666;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-        }
-        
-        .admin-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .admin-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .admin-hint {
+        .hint {
             font-size: 12px;
             color: #999;
             margin-top: 8px;
         }
         
-        .password-field {
-            margin-bottom: 15px;
+        .welcome-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
         }
         
-        .password-field label {
-            display: block;
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .password-field input {
-            width: 100%;
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -252,49 +198,121 @@
         <h1>🌸 花名查重系统</h1>
         <p class="subtitle">新人入职取花名，快速查重检测</p>
         
-        <!-- 查重区域 -->
-        <div class="input-group">
-            <input type="text" id="flowerName" placeholder="请输入花名" maxlength="20">
-            <button class="btn-check" onclick="checkName()">查重</button>
+        <!-- 1. 选择身份页面 -->
+        <div id="page-role" class="page">
+            <div class="welcome-icon">👋</div>
+            <p style="text-align: center; margin-bottom: 30px; color: #666;">请选择您的身份</p>
+            <button class="btn btn-user" onclick="showPage('check')">我是新人 / 普通用户</button>
+            <button class="btn btn-admin" onclick="showPage('login')">我是管理员</button>
         </div>
         
-        <!-- 查重结果 -->
-        <div id="result" class="result"></div>
-        
-        <div class="divider"></div>
-        
-        <!-- 已使用花名列表 -->
-        <div class="history-section">
-            <div class="history-title">
-                <span>已使用花名</span>
-                <button class="btn-refresh" onclick="loadNames()">刷新</button>
-            </div>
-            <div class="name-list" id="nameList">
-                <div class="empty-tip">暂无数据</div>
-            </div>
-        </div>
-        
-        <!-- 管理员批量导入区域 -->
-        <div class="admin-section">
-            <div class="admin-title">📦 批量导入花名（管理员）</div>
+        <!-- 2. 管理员登录页面 -->
+        <div id="page-login" class="page hidden">
+            <div class="section-title">管理员登录</div>
             
-            <!-- 密码输入 -->
-            <div class="password-field">
-                <label>管理员密码</label>
+            <div class="input-group">
                 <input type="password" id="adminPassword" placeholder="请输入管理员密码">
             </div>
             
+            <button class="btn btn-action" onclick="loginAdmin()">登录</button>
+            
+            <div id="login-result" class="result"></div>
+            
+            <button class="btn btn-back" onclick="showPage('role')">返回</button>
+        </div>
+        
+        <!-- 3. 普通用户查重页面 -->
+        <div id="page-check" class="page hidden">
+            <div class="section-title">花名查重</div>
+            
+            <div class="input-group">
+                <input type="text" id="flowerName" placeholder="请输入花名" maxlength="20">
+            </div>
+            
+            <button class="btn btn-user" onclick="checkName()">查重</button>
+            
+            <div id="check-result" class="result"></div>
+            
+            <button class="btn btn-back" onclick="showPage('role')">返回身份选择</button>
+        </div>
+        
+        <!-- 4. 管理员批量导入页面 -->
+        <div id="page-admin" class="page hidden">
+            <div class="section-title">批量导入花名</div>
+            
             <textarea id="batchNames" placeholder="每行一个花名，示例：&#10;lili&#10;hanmei&#10;xiaoming"></textarea>
-            <button class="btn-batch" onclick="batchAdd()">🚀 批量导入</button>
-            <div class="admin-hint">每行一个花名，需要管理员密码才能导入</div>
+            
+            <button class="btn btn-action" onclick="batchAdd()">🚀 批量导入</button>
+            
+            <div id="admin-result" class="result"></div>
+            
+            <button class="btn btn-back" onclick="showPage('role')">返回身份选择</button>
+        </div>
+        
+        <!-- 已使用花名列表（所有页面底部都显示） -->
+        <div class="divider"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 14px; color: #666;">已使用花名</span>
+            <button class="btn btn-back" style="width: auto; padding: 6px 12px; font-size: 12px; margin: 0;" onclick="loadNames()">刷新</button>
+        </div>
+        <div class="name-list" id="nameList">
+            <div class="empty-tip">暂无数据</div>
         </div>
     </div>
     
     <script>
-        // 查重（公开接口）
+        // 页面切换
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            // 清空结果
+            document.querySelectorAll('.result').forEach(r => {
+                r.className = 'result';
+                r.style.display = 'none';
+            });
+        }
+        
+        // 管理员登录
+        async function loginAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            if (!password) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入密码';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/batch-add', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        password: password,
+                        names: ['__TEST__']  // 测试密码是否正确
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    // 密码正确，进入管理员页面
+                    showPage('admin');
+                    document.getElementById('adminPassword').value = '';
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ ' + data.message;
+                }
+            } catch (e) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请求失败，请稍后重试';
+            }
+        }
+        
+        // 花名查重
         async function checkName() {
             const name = document.getElementById('flowerName').value.trim();
-            const resultDiv = document.getElementById('result');
+            const resultDiv = document.getElementById('check-result');
             
             if (!name) {
                 resultDiv.className = 'result error';
@@ -310,28 +328,25 @@
                 });
                 const data = await res.json();
                 
-                if (data.success) {
-                    resultDiv.className = data.available ? 'result success' : 'result error';
-                    resultDiv.textContent = data.message;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = data.message;
-                }
+                resultDiv.className = data.available ? 'result success' : 'result error';
+                resultDiv.textContent = data.message;
             } catch (e) {
                 resultDiv.className = 'result error';
                 resultDiv.textContent = '请求失败，请稍后重试';
             }
         }
         
-        // 批量导入（需要管理员密码）
+        // 批量导入
         async function batchAdd() {
             const password = document.getElementById('adminPassword').value;
             const text = document.getElementById('batchNames').value.trim();
-            const resultDiv = document.getElementById('result');
+            const resultDiv = document.getElementById('admin-result');
             
+            // 需要重新验证密码
             if (!password) {
                 resultDiv.className = 'result error';
-                resultDiv.textContent = '请输入管理员密码';
+                resultDiv.textContent = '请先在登录页面输入密码';
+                showPage('login');
                 return;
             }
             
@@ -341,7 +356,6 @@
                 return;
             }
             
-            // 按行分割，去除空行
             const names = text.split('\n').map(n => n.trim()).filter(n => n);
             
             if (names.length === 0) {
@@ -365,8 +379,8 @@
                 resultDiv.textContent = data.message;
                 
                 if (data.success) {
-                    document.getElementById('batchNames').value = '';  // 清空输入框
-                    loadNames();  // 刷新列表
+                    document.getElementById('batchNames').value = '';
+                    loadNames();
                 }
             } catch (e) {
                 resultDiv.className = 'result error';
