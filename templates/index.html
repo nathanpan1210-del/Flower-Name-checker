@@ -246,16 +246,6 @@
             
             <div id="admin-result" class="result"></div>
             
-            <!-- 管理员专用花名列表 -->
-            <div class="divider"></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 14px; color: #666; font-weight: bold;">📋 已使用花名</span>
-                <button class="btn btn-back" style="width: auto; padding: 6px 12px; font-size: 12px; margin: 0;" onclick="loadNames()">刷新</button>
-            </div>
-            <div class="name-list" id="adminNameList" style="max-height: 250px;">
-                <div class="empty-tip">暂无花名</div>
-            </div>
-            
             <button class="btn btn-back" onclick="showPage('role')">返回身份选择</button>
         </div>
         
@@ -281,33 +271,6 @@
                 r.className = 'result';
                 r.style.display = 'none';
             });
-            // 进入管理员页面时加载花名列表
-            if (page === 'admin') {
-                loadAdminNames();
-            }
-        }
-        
-        // 加载管理员页面的花名列表
-        async function loadAdminNames() {
-            try {
-                const res = await fetch('/api/list');
-                const data = await res.json();
-                const listDiv = document.getElementById('adminNameList');
-                
-                if (data.names.length === 0) {
-                    listDiv.innerHTML = '<div class="empty-tip">暂无花名</div>';
-                    return;
-                }
-                
-                listDiv.innerHTML = data.names.map(item => `
-                    <div class="name-item">
-                        <span>${item.name}</span>
-                        <span class="time">${new Date(item.created_at).toLocaleDateString()}</span>
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error('加载失败');
-            }
         }
         
         // 管理员登录
@@ -411,8 +374,7 @@
                 
                 if (data.success) {
                     document.getElementById('batchNames').value = '';
-                    loadNames();       // 刷新底部列表
-                    loadAdminNames();  // 刷新管理员页面列表
+                    loadNames();       // 刷新花名列表
                 }
             } catch (e) {
                 resultDiv.className = 'result error';
