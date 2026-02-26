@@ -52,18 +52,18 @@ def index():
 def check():
     """查重API - 公开接口"""
     data = request.get_json()
-    name = data.get('name', '').strip().lower()
+    name = data.get('name', '').strip()
     
     if not name:
         return jsonify({'success': False, 'message': '请输入花名'})
     
-    exists = check_flower_name(name)
+    exists = check_flower_name(name.lower())
     
     if exists:
         return jsonify({
             'success': True,
             'available': False,
-            'message': '❌ 花名已被占用，请选择其他名字'
+            'message': '❌ 花名重复，请选择其他名字'
         })
     else:
         return jsonify({
@@ -71,27 +71,6 @@ def check():
             'available': True,
             'message': '✅ 花名可用！'
         })
-
-
-@app.route('/api/debug', methods=['GET'])
-def debug():
-    """调试接口 - 查看环境变量是否正确读取"""
-    return jsonify({
-        'admin_password_read': '***' + ADMIN_PASSWORD[-4:] if ADMIN_PASSWORD else 'None',
-        'env_vars': list(os.environ.keys())
-    })
-
-
-@app.route('/api/verify-password', methods=['POST'])
-def verify_password():
-    """验证密码接口 - 调试用"""
-    data = request.get_json()
-    input_password = data.get('password', '')
-    return jsonify({
-        'input_password': input_password,
-        'stored_password': '***' + ADMIN_PASSWORD[-4:] if ADMIN_PASSWORD else 'None',
-        'match': input_password == ADMIN_PASSWORD
-    })
 
 
 @app.route('/api/batch-add', methods=['POST'])
