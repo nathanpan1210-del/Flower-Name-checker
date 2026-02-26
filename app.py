@@ -6,6 +6,7 @@
 
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -13,8 +14,8 @@ app = Flask(__name__)
 # 注意：服务重启后数据会丢失
 flower_names_db = {}  # {'name': {'name': '花名', 'created_at': timestamp}}
 
-# 管理员密码（Render 环境变量设置）
-ADMIN_PASSWORD = None  # 从环境变量读取
+# 管理员密码从环境变量读取，默认 admin123
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 
 def check_flower_name(name):
@@ -72,30 +73,25 @@ def check():
         })
 
 
-@app.route('/api/add', methods=['POST'])
-def add():
-    """添加花名API - 需要管理员密码"""
+@app.route('/api/debug', methods=['GET'])
+def debug():
+    """调试接口 - 查看环境变量是否正确读取"""
+    return jsonify({
+        'admin_password_read': '***' + ADMIN_PASSWORD[-4:] if ADMIN_PASSWORD else 'None',
+        'env_vars': list(os.environ.keys())
+    })
+
+
+@app.route('/api/verify-password', methods=['POST'])
+def verify_password():
+    """验证密码接口 - 调试用"""
     data = request.get_json()
-    password = data.get('password', '')
-    name = data.get('name', '').strip().lower()
-    
-    # 验证密码
-    if password != ADMIN_PASSWORD:
-        return jsonify({'success': False, 'message': '❌ 密码错误，无权操作'})
-    
-    if not name:
-        return jsonify({'success': False, 'message': '请输入花名'})
-    
-    if add_flower_name(name):
-        return jsonify({
-            'success': True,
-            'message': '✅ 花名添加成功！'
-        })
-    else:
-        return jsonify({
-            'success': False,
-            'message': '❌ 花名已存在，添加失败'
-        })
+    input_password = data.get('password', '')
+    return jsonify({
+        'input_password': input_password,
+        'stored_password': '***' + ADMIN_PASSWORD[-4:] if ADMIN_PASSWORD else 'None',
+        'match': input_password == ADMIN_PASSWORD
+    })
 
 
 @app.route('/api/batch-add', methods=['POST'])
@@ -107,7 +103,7 @@ def batch_add():
     
     # 验证密码
     if password != ADMIN_PASSWORD:
-        return jsonify({'success': False, 'message': '❌ 密码错误，无权操作'})
+        return jsonify({'success': False, 'message': '❌ 密码错误'})
     
     if not names:
         return jsonify({'success': False, 'message': '请提供花名列表'})
@@ -133,6 +129,4 @@ def batch_add():
 
 
 if __name__ == '__main__':
-    import os
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')  # 默认密码
     app.run(host='0.0.0.0', port=5000, debug=True)
