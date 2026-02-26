@@ -13,6 +13,9 @@ app = Flask(__name__)
 # 注意：服务重启后数据会丢失
 flower_names_db = {}  # {'name': {'name': '花名', 'created_at': timestamp}}
 
+# 管理员密码（Render 环境变量设置）
+ADMIN_PASSWORD = None  # 从环境变量读取
+
 
 def check_flower_name(name):
     """检查花名是否存在"""
@@ -46,7 +49,7 @@ def index():
 
 @app.route('/api/check', methods=['POST'])
 def check():
-    """查重API"""
+    """查重API - 公开接口"""
     data = request.get_json()
     name = data.get('name', '').strip().lower()
     
@@ -71,9 +74,14 @@ def check():
 
 @app.route('/api/add', methods=['POST'])
 def add():
-    """添加花名API"""
+    """添加花名API - 需要管理员密码"""
     data = request.get_json()
+    password = data.get('password', '')
     name = data.get('name', '').strip().lower()
+    
+    # 验证密码
+    if password != ADMIN_PASSWORD:
+        return jsonify({'success': False, 'message': '❌ 密码错误，无权操作'})
     
     if not name:
         return jsonify({'success': False, 'message': '请输入花名'})
@@ -90,21 +98,16 @@ def add():
         })
 
 
-@app.route('/api/list', methods=['GET'])
-def list_names():
-    """获取所有已使用的花名"""
-    names = get_all_names()
-    return jsonify({
-        'success': True,
-        'names': names
-    })
-
-
 @app.route('/api/batch-add', methods=['POST'])
 def batch_add():
-    """批量添加花名API"""
+    """批量添加花名API - 需要管理员密码"""
     data = request.get_json()
+    password = data.get('password', '')
     names = data.get('names', [])
+    
+    # 验证密码
+    if password != ADMIN_PASSWORD:
+        return jsonify({'success': False, 'message': '❌ 密码错误，无权操作'})
     
     if not names:
         return jsonify({'success': False, 'message': '请提供花名列表'})
@@ -130,4 +133,6 @@ def batch_add():
 
 
 if __name__ == '__main__':
+    import os
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')  # 默认密码
     app.run(host='0.0.0.0', port=5000, debug=True)

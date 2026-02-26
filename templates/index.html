@@ -50,8 +50,7 @@
             margin-bottom: 20px;
         }
         
-        input[type="text"], textarea {
-            width: 100%;
+        input[type="text"], input[type="password"], textarea {
             padding: 14px 18px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
@@ -60,11 +59,16 @@
             outline: none;
         }
         
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
             border-color: #667eea;
         }
         
+        input[type="text"], input[type="password"] {
+            width: 100%;
+        }
+        
         textarea {
+            width: 100%;
             min-height: 100px;
             resize: vertical;
             font-family: inherit;
@@ -226,6 +230,21 @@
             color: #999;
             margin-top: 8px;
         }
+        
+        .password-field {
+            margin-bottom: 15px;
+        }
+        
+        .password-field label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .password-field input {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -242,9 +261,6 @@
         <!-- 查重结果 -->
         <div id="result" class="result"></div>
         
-        <!-- 添加花名按钮 -->
-        <button class="btn-add" onclick="addName()">✨ 添加花名到系统</button>
-        
         <div class="divider"></div>
         
         <!-- 已使用花名列表 -->
@@ -260,15 +276,22 @@
         
         <!-- 管理员批量导入区域 -->
         <div class="admin-section">
-            <div class="admin-title">📦 批量导入花名</div>
+            <div class="admin-title">📦 批量导入花名（管理员）</div>
+            
+            <!-- 密码输入 -->
+            <div class="password-field">
+                <label>管理员密码</label>
+                <input type="password" id="adminPassword" placeholder="请输入管理员密码">
+            </div>
+            
             <textarea id="batchNames" placeholder="每行一个花名，示例：&#10;lili&#10;hanmei&#10;xiaoming"></textarea>
             <button class="btn-batch" onclick="batchAdd()">🚀 批量导入</button>
-            <div class="admin-hint">每行一个花名，点击按钮一次性导入全部</div>
+            <div class="admin-hint">每行一个花名，需要管理员密码才能导入</div>
         </div>
     </div>
     
     <script>
-        // 查重
+        // 查重（公开接口）
         async function checkName() {
             const name = document.getElementById('flowerName').value.trim();
             const resultDiv = document.getElementById('result');
@@ -300,41 +323,17 @@
             }
         }
         
-        // 添加花名
-        async function addName() {
-            const name = document.getElementById('flowerName').value.trim();
-            const resultDiv = document.getElementById('result');
-            
-            if (!name) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = '请输入花名';
-                return;
-            }
-            
-            try {
-                const res = await fetch('/api/add', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name: name})
-                });
-                const data = await res.json();
-                
-                resultDiv.className = data.success ? 'result success' : 'result error';
-                resultDiv.textContent = data.message;
-                
-                if (data.success) {
-                    loadNames();  // 刷新列表
-                }
-            } catch (e) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = '请求失败，请稍后重试';
-            }
-        }
-        
-        // 批量导入
+        // 批量导入（需要管理员密码）
         async function batchAdd() {
+            const password = document.getElementById('adminPassword').value;
             const text = document.getElementById('batchNames').value.trim();
             const resultDiv = document.getElementById('result');
+            
+            if (!password) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入管理员密码';
+                return;
+            }
             
             if (!text) {
                 resultDiv.className = 'result error';
@@ -355,7 +354,10 @@
                 const res = await fetch('/api/batch-add', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({names: names})
+                    body: JSON.stringify({
+                        password: password,
+                        names: names
+                    })
                 });
                 const data = await res.json();
                 
