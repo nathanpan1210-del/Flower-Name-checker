@@ -291,6 +291,8 @@
             }
         }
         
+        let adminPassword = '';  // 保存管理员密码
+        
         // 管理员登录
         async function loginAdmin() {
             const password = document.getElementById('adminPassword').value;
@@ -314,6 +316,7 @@
                 const data = await res.json();
                 
                 if (data.success) {
+                    adminPassword = password;  // 保存密码
                     showPage('admin');
                     document.getElementById('adminPassword').value = '';
                 } else {
@@ -350,7 +353,7 @@
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        password: document.getElementById('adminPassword').value,
+                        password: adminPassword,  // 使用保存的密码
                         names: names
                     })
                 });
