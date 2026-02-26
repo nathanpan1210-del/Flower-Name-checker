@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>花名查重系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-check {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-add {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .btn-add:hover {
+            background: #45a049;
+        }
+        
+        .result {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .divider {
+            border-top: 1px solid #e0e0e0;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .divider::after {
+            content: '已使用花名';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 15px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .name-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .name-item {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .name-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .name-item .time {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .empty-tip {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .history-section {
+            margin-top: 20px;
+        }
+        
+        .history-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-refresh {
+            background: #f0f0f0;
+            color: #666;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 花名查重系统</h1>
+        <p class="subtitle">新人入职取花名，快速查重检测</p>
+        
+        <!-- 查重区域 -->
+        <div class="input-group">
+            <input type="text" id="flowerName" placeholder="请输入花名" maxlength="20">
+            <button class="btn-check" onclick="checkName()">查重</button>
+        </div>
+        
+        <!-- 查重结果 -->
+        <div id="result" class="result"></div>
+        
+        <!-- 添加花名按钮 -->
+        <button class="btn-add" onclick="addName()">✨ 添加花名到系统</button>
+        
+        <div class="divider"></div>
+        
+        <!-- 已使用花名列表 -->
+        <div class="history-section">
+            <div class="history-title">
+                <span>已使用花名</span>
+                <button class="btn-refresh" onclick="loadNames()">刷新</button>
+            </div>
+            <div class="name-list" id="nameList">
+                <div class="empty-tip">暂无数据</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 查重
+        async function checkName() {
+            const name = document.getElementById('flowerName').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!name) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入花名';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/check', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: name})
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    resultDiv.className = data.available ? 'result success' : 'result error';
+                    resultDiv.textContent = data.message;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = data.message;
+                }
+            } catch (e) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请求失败，请稍后重试';
+            }
+        }
+        
+        // 添加花名
+        async function addName() {
+            const name = document.getElementById('flowerName').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!name) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入花名';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/add', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: name})
+                });
+                const data = await res.json();
+                
+                resultDiv.className = data.success ? 'result success' : 'result error';
+                resultDiv.textContent = data.message;
+                
+                if (data.success) {
+                    loadNames();  // 刷新列表
+                }
+            } catch (e) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请求失败，请稍后重试';
+            }
+        }
+        
+        // 加载花名列表
+        async function loadNames() {
+            try {
+                const res = await fetch('/api/list');
+                const data = await res.json();
+                const listDiv = document.getElementById('nameList');
+                
+                if (data.names.length === 0) {
+                    listDiv.innerHTML = '<div class="empty-tip">暂无花名</div>';
+                    return;
+                }
+                
+                listDiv.innerHTML = data.names.map(item => `
+                    <div class="name-item">
+                        <span>${item.name}</span>
+                        <span class="time">${new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('加载失败');
+            }
+        }
+        
+        // 回车键触发查重
+        document.getElementById('flowerName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkName();
+            }
+        });
+        
+        // 页面加载时获取花名列表
+        loadNames();
+    </script>
+</body>
+</html>
