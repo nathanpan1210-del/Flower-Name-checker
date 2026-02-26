@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # 使用内存存储（Render 免费版不支持持久化存储）
 # 注意：服务重启后数据会丢失
-flower_names_db = {}  # {'name': {'created_at': timestamp}}
+flower_names_db = {}  # {'name': {'name': '花名', 'created_at': timestamp}}
 
 
 def check_flower_name(name):
@@ -97,6 +97,35 @@ def list_names():
     return jsonify({
         'success': True,
         'names': names
+    })
+
+
+@app.route('/api/batch-add', methods=['POST'])
+def batch_add():
+    """批量添加花名API"""
+    data = request.get_json()
+    names = data.get('names', [])
+    
+    if not names:
+        return jsonify({'success': False, 'message': '请提供花名列表'})
+    
+    added = []
+    skipped = []
+    
+    for name in names:
+        name = name.strip()
+        if not name:
+            continue
+        if add_flower_name(name):
+            added.append(name)
+        else:
+            skipped.append(name)
+    
+    return jsonify({
+        'success': True,
+        'message': f'✅ 成功添加 {len(added)} 个，{len(skipped)} 个已存在',
+        'added': added,
+        'skipped': skipped
     })
 
 

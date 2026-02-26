@@ -26,7 +26,7 @@
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
         }
         
@@ -50,8 +50,8 @@
             margin-bottom: 20px;
         }
         
-        input[type="text"] {
-            flex: 1;
+        input[type="text"], textarea {
+            width: 100%;
             padding: 14px 18px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
@@ -60,8 +60,14 @@
             outline: none;
         }
         
-        input[type="text"]:focus {
+        input[type="text"]:focus, textarea:focus {
             border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
         }
         
         button {
@@ -93,6 +99,17 @@
         
         .btn-add:hover {
             background: #45a049;
+        }
+        
+        .btn-batch {
+            background: #2196F3;
+            color: white;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .btn-batch:hover {
+            background: #1976D2;
         }
         
         .result {
@@ -189,6 +206,26 @@
             font-size: 12px;
             border-radius: 6px;
         }
+        
+        .admin-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .admin-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .admin-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -219,6 +256,14 @@
             <div class="name-list" id="nameList">
                 <div class="empty-tip">暂无数据</div>
             </div>
+        </div>
+        
+        <!-- 管理员批量导入区域 -->
+        <div class="admin-section">
+            <div class="admin-title">📦 批量导入花名</div>
+            <textarea id="batchNames" placeholder="每行一个花名，示例：&#10;lili&#10;hanmei&#10;xiaoming"></textarea>
+            <button class="btn-batch" onclick="batchAdd()">🚀 批量导入</button>
+            <div class="admin-hint">每行一个花名，点击按钮一次性导入全部</div>
         </div>
     </div>
     
@@ -278,6 +323,47 @@
                 resultDiv.textContent = data.message;
                 
                 if (data.success) {
+                    loadNames();  // 刷新列表
+                }
+            } catch (e) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请求失败，请稍后重试';
+            }
+        }
+        
+        // 批量导入
+        async function batchAdd() {
+            const text = document.getElementById('batchNames').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!text) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入花名列表';
+                return;
+            }
+            
+            // 按行分割，去除空行
+            const names = text.split('\n').map(n => n.trim()).filter(n => n);
+            
+            if (names.length === 0) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入花名列表';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/batch-add', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({names: names})
+                });
+                const data = await res.json();
+                
+                resultDiv.className = data.success ? 'result success' : 'result error';
+                resultDiv.textContent = data.message;
+                
+                if (data.success) {
+                    document.getElementById('batchNames').value = '';  // 清空输入框
                     loadNames();  // 刷新列表
                 }
             } catch (e) {
