@@ -128,5 +128,15 @@ def batch_add():
     })
 
 
+@app.route('/api/list', methods=['GET'])
+def list_names():
+    """获取所有已使用的花名"""
+    names = get_all_names()
+    return jsonify({
+        'success': True,
+        'names': names
+    })
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
