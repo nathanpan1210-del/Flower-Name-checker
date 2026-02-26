@@ -255,10 +255,9 @@
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-' + page).classList.add('active');
-            // 清空结果
+            // 清空结果（只移除 show 类，不覆盖 style）
             document.querySelectorAll('.result').forEach(r => {
                 r.className = 'result';
-                r.style.display = 'none';
             });
         }
         
