@@ -192,11 +192,10 @@ def feishu_bitable_list_records(app_token, table_id, page_size=100):
     """列出 Bitable 记录"""
     import httpx
     
-    # 获取 access token（这里简化处理，实际需要用 app_id/app_secret 获取）
-    # 假设环境变量中有 FEISHU_ACCESS_TOKEN
-    access_token = os.environ.get('FEISHU_ACCESS_TOKEN', '')
+    # 直接使用 token（临时方案，生产环境建议用环境变量）
+    access_token = os.environ.get('FEISHU_ACCESS_TOKEN', '') or 't-g1042r9xNRA3V7R6MVNINUVYI3FLJNMS4W7CZGDN'
     
-    if not access_token:
+    if not access_token or access_token == 'your_token_here':
         # 返回模拟数据用于本地测试
         return {'success': True, 'items': []}
     
@@ -223,9 +222,9 @@ def feishu_bitable_create_record(app_token, table_id, fields):
     """创建 Bitable 记录"""
     import httpx
     
-    access_token = os.environ.get('FEISHU_ACCESS_TOKEN', '')
+    access_token = os.environ.get('FEISHU_ACCESS_TOKEN', '') or 't-g1042r9xNRA3V7R6MVNINUVYI3FLJNMS4W7CZGDN'
     
-    if not access_token:
+    if not access_token or access_token == 'your_token_here':
         # 本地测试模式
         return {"success": True}
     
