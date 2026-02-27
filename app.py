@@ -14,8 +14,8 @@ app = Flask(__name__)
 # 飞书 Bitable 配置
 BITABLE_APP_TOKEN = os.environ.get('BITABLE_APP_TOKEN', 'Mysqbz91aaaqYiszBIfc9AAmnJf')
 BITABLE_TABLE_ID = os.environ.get('BITABLE_TABLE_ID', 'tblz9AVdx8lVpqPz')
-BITABLE_FIELD_NAME = 'fldwJBgHj4'  # 花名字段 ID
-BITABLE_FIELD_TIME = 'fldoFLe8kX'  # 创建时间字段 ID
+BITABLE_FIELD_NAME = '花名'  # 花名（用字段名而不是 ID）
+BITABLE_FIELD_TIME = '创建时间'  # 创建时间（用字段名而不是 ID）
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 
