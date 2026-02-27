@@ -153,6 +153,36 @@ def list_names():
     })
 
 
+@app.route('/api/debug', methods=['GET'])
+def debug():
+    """调试接口"""
+    import httpx
+    
+    access_token = os.environ.get('FEISHU_ACCESS_TOKEN', '')
+    
+    # 测试 API
+    url = f"https://open.feishu.cn/open-apis/bitable/v1/apps/{BITABLE_APP_TOKEN}/tables/{BITABLE_TABLE_ID}/records"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        resp = httpx.get(url, headers=headers, params={"page_size": 100}, timeout=30)
+        data = resp.json()
+        
+        return jsonify({
+            "token_set": bool(access_token),
+            "token_prefix": access_token[:10] if access_token else "",
+            "api_response": data,
+            "url": url
+        })
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        })
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
